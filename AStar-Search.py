@@ -5,21 +5,56 @@
 
 import random
 
-openList = []
-closedList = []
-
 # Class for node object. Holds f, g, h, and parent node.
 
 class Node:
-    def __init__(self):
+    def __init__(self, p = None, coord = None):
+        self.parent = p
+        self.position = coord
+
         self.f = 0
         self.g = 0
         self.h = 0
-        self.parent = None
 
     def __str__(self):
-        return "f: ", self.f, "g: ", self.g, "h: ", self.h, "parent node: ", self.parent
+        return "f: ", self.f, "g: ", self.g, "h: ", self.h, "parent node: ", self.parent, "coordinate: ", self.coord
 
+def astar(maze, start, goal):
+
+    # Creating the Start and End Nodes
+    startNode = Node(None, start)
+    goalNode = Node(None, goal)
+
+    # Open and closed list
+    openList = []
+    closedList = []
+
+    openList.append(startNode)
+
+    while len(openList) > 0:
+
+        currNode = openList[0]
+        currIndex = 0
+
+        # Code for finding lowest F node in list
+        for index, item in enumerate(openList):
+            if item.f < currNode.f:
+                currNode = item
+                currIndex = index
+
+        # Removing the current lowest F node from the openList, adding it to closedList
+        openList.pop(currIndex)
+        closedList.append(currNode)
+
+        if currNode == goalNode:
+            pathList = []
+
+            pathNode = currNode
+            while pathNode is not None:
+                pathList.append(pathNode.position)
+                pathNode = pathNode.parent
+
+            return pathList[::-1]
 
 
 def generateMaze(size):
@@ -48,7 +83,7 @@ class main():
     maze = generateMaze(size)
     start = generateCoord(size)
     goal = generateCoord(size)
-    
+
     maze[start[0]][start[1]] = 2
     maze[goal[0]][goal[1]] = 3
     for i in maze:
