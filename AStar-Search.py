@@ -17,7 +17,7 @@ class Node:
         self.h = 0
 
     def __str__(self):
-        return "f: ", self.f, "g: ", self.g, "h: ", self.h, "parent node: ", self.parent, "coordinate: ", self.coord
+        return("f: ", self.f, "g: ", self.g, "h: ", self.h, "parent node: ", self.parent, "coordinate: ", self.position)
 
 def astar(maze, start, goal):
 
@@ -30,32 +30,6 @@ def astar(maze, start, goal):
     closedList = []
 
     openList.append(startNode)
-
-    while len(openList) > 0:
-
-        currNode = openList[0]
-        currIndex = 0
-
-        # Code for finding lowest F node in list
-        for index, item in enumerate(openList):
-            if item.f < currNode.f:
-                currNode = item
-                currIndex = index
-
-        # Removing the current lowest F node from the openList, adding it to closedList
-        openList.pop(currIndex)
-        closedList.append(currNode)
-
-        if currNode == goalNode:
-            pathList = []
-
-            pathNode = currNode
-            while pathNode is not None:
-                pathList.append(pathNode.position)
-                pathNode = pathNode.parent
-
-            return pathList[::-1]
-
 
 def generateMaze(size):
     maze = []
@@ -84,8 +58,14 @@ class main():
     start = generateCoord(size)
     goal = generateCoord(size)
 
+    print(start)
+    print(goal)
+
     maze[start[0]][start[1]] = 2
     maze[goal[0]][goal[1]] = 3
+
     for i in maze:
         print(i)
+
+    print(astar(maze, start, goal))
 
