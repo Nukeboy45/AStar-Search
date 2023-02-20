@@ -34,13 +34,13 @@ def astar(maze, start, goal):
     openList.append(startNode)
 
     i = 0
-    while openList != []:
+    while openList != [] and i < 50:
 
         i += 1
         currNode = openList[0]
         currIndex = 0
 
-        # Choosing node with lowest f value and storing index
+        # Choosing node with lowest f value and replacing current node & index with that node
         for index, item in enumerate(openList):
             if item.f < currNode.f:
                 currNode = item
@@ -78,7 +78,6 @@ def astar(maze, start, goal):
             childNodes.append(childNode)
 
         for childNode in childNodes:
-
             for node in closedList:
                 if node == childNode:
                     continue
@@ -90,6 +89,11 @@ def astar(maze, start, goal):
                     continue
 
             openList.append(childNode)
+
+    if i == 50:
+        emptylist = []
+        print('entered')
+        return emptylist
 
 # Function for assinging g, h, and f values
 def assignValues(node, nodePosition, goalPosition):
@@ -103,12 +107,12 @@ def assignValues(node, nodePosition, goalPosition):
     node.f = node.g + node.h
 
 # Generates a random board given integer size. Randomly fills out 10% of the board with unpathable nodes (1)
-def generateMaze(size):
+def generateMaze(size, density):
     maze = []
     for x in range(size):
         row = []
         for y in range(size):
-            if (random.randint(0, 10) == 0):
+            if (random.randint(0, 10) < density):
                 row.append(1)
             else:
                 row.append(0)
@@ -119,33 +123,71 @@ def generateMaze(size):
 def generateCoord(size):
     x = random.randint(0, size - 1)
     y = random.randint(0, size - 1)
-    return [x, y]
+    return (x, y)
+
+# Used to test pathfinding complexity. Given size and a given start coordinate, generates a goal node coordinate on the
+# opposite side of the board
+def generateComplexCoord(size, startPos):
+    x = 0
+    y = 0
+    if startPos[0] < size / 2:
+        x = random.randint(int(size / 2), size - 1)
+    else:
+        x = random.randint(0, int(size / 2))
+
+    if startPos[1] < size / 2:
+        y = random.randint(int(size / 2), size - 1)
+    else:
+        y = random.randint(0, int(size / 2))
+
+    return (x, y)
+
+
+# Utility function that takes a maze variable, start position, and end position, and prints the board
+def printMaze(maze, startPos, endPos):
+
+    maze[startPos[1]][startPos[0]] = 2
+    maze[endPos[1]][endPos[0]] = 3
+
+    for i in range(len(maze)):
+        line = ""
+        for y in maze[i]:
+            if y == 0:
+                line += "- "
+            elif y == 1:
+                line += "X "
+            elif y == 2:
+                line += "S "
+            elif y == 3:
+                line += "G "
+            elif y == 4:
+                line += "O "
+        print(line)
 
 # Driver code
 class main():
-    size = 8
+    size = 15
 
     # creating a random scenario
-    maze = generateMaze(size)
+    maze = generateMaze(size, 1)
     start = generateCoord(size)
-    goal = generateCoord(size)
+    goal = generateComplexCoord(size, start)
 
     # prevents duplicate coordinates
     while start == goal:
         goal = generateCoord(size)
 
-    # for the display, changes start and goal node coordinates to be 2 and 3 respectively
-    maze[start[1]][start[0]] = 2
-    maze[goal[1]][goal[0]] = 3
+    printMaze(maze, start, goal)
 
-    for i in maze:
-        print(i)
-
+    # Runs A-Star Search, to assign path list to path variable
     path = astar(maze, start, goal)
     print(path)
-    for node in path:
-        maze[node.position[1]][node.position[0]] = 2
+    if path == []:
+        print("There is no path to be found!")
+    else:
+        for node in path:
+            maze[node.position[1]][node.position[0]] = 4
 
-    for i in maze:
-        print(i)
+    # Prints maze with finished path
+    printMaze(maze, start, goal)
 
